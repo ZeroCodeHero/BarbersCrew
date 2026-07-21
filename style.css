@@ -1,0 +1,313 @@
+/* ============================================================================
+   Barbers Crew — NFC review card. Clean, sleek, monochrome (black & white).
+   Client-specific values (name, links) live in the CONFIG block in index.html
+   and are applied by app.js. This file is the fixed design — do not edit per
+   client.
+   ============================================================================ */
+
+:root {
+  /* Monochrome palette — pure black canvas + white ink. */
+  --base:      #0A0A0A;            /* deep page backdrop */
+  --surface:   #141414;            /* card panel (top of gradient) */
+  --surface-2: #0F0F0F;            /* card panel (bottom of gradient) */
+  --fg:        #FFFFFF;
+  --muted:     #9A9A9A;
+  --hairline:  rgba(255, 255, 255, 0.12);
+
+  --radius: 14px;
+  --card-radius: 26px;
+  --touch: 48px;                   /* minimum touch target (buttons are larger) */
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--fg);
+  /* System font stack — no web fonts, no network requests for type. */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+               Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Near-black backdrop with a faint top light. */
+  background:
+    radial-gradient(120% 90% at 50% -10%, #1A1A1A 0%, var(--base) 55%) fixed,
+    var(--base);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding:
+    max(20px, env(safe-area-inset-top))
+    max(18px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom))
+    max(18px, env(safe-area-inset-left));
+  overflow: hidden;
+  position: relative;
+}
+
+/* ---- Ambient background decoration (soft light + fine grid) --------------- */
+.bg-decor { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg-decor::before {
+  /* single soft overhead spotlight */
+  content: "";
+  position: absolute;
+  top: -34vmax; left: 50%;
+  width: 80vmax; height: 80vmax;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 62%);
+  filter: blur(50px);
+}
+.bg-decor::after {
+  /* faint vignette to seat the card */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% 45%, transparent 55%, rgba(0,0,0,0.6) 100%);
+}
+
+/* ---- Card: a floating, framed panel --------------------------------------- */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: clamp(36px, 8vw, 48px) clamp(24px, 7vw, 38px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 6.5vw, 38px);
+
+  background:
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-radius: var(--card-radius);
+  box-shadow:
+    0 30px 70px -20px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+/* Fine dot-grid texture, fading toward the centre so text stays clean. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  -webkit-mask: radial-gradient(115% 90% at 50% 0%, #000 6%, transparent 60%);
+          mask: radial-gradient(115% 90% at 50% 0%, #000 6%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Crisp hairline border (white -> faint). */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg,
+              rgba(255, 255, 255, 0.28) 0%,
+              rgba(255, 255, 255, 0.06) 40%,
+              rgba(255, 255, 255, 0.02) 65%,
+              rgba(255, 255, 255, 0.18) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Soft highlight inside the top of the card (depth). */
+.card-glow {
+  position: absolute;
+  top: -42%;
+  left: 50%;
+  width: 130%;
+  height: 90%;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.10), transparent 70%);
+  pointer-events: none;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.logo {
+  display: block;
+  width: min(74%, 240px);
+  height: auto;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg);
+  padding: 7px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+.lede {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Thin rule under the hero — echoes the logo's bars. */
+.rule {
+  width: 56px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+  opacity: 0.9;
+}
+
+/* ---- Action buttons -------------------------------------------------------- */
+.actions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  min-height: 62px;               /* well above the 48px minimum */
+  padding: 16px 22px;
+  border-radius: var(--radius);
+
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+
+  transition: transform 220ms ease, box-shadow 220ms ease,
+              background-color 220ms ease, border-color 220ms ease, filter 220ms ease;
+}
+
+/* Primary: solid white, black ink — the review CTA. */
+.btn-primary {
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECECEC 100%);
+  color: #0A0A0A;
+  box-shadow: 0 12px 30px -12px rgba(255, 255, 255, 0.35);
+}
+
+/* Ghost: transparent with a hairline outline — the social / site links. */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+/* Moving sheen across the primary button. */
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(0, 0, 0, 0.06), transparent);
+  transform: skewX(-18deg);
+  animation: sheen 5.5s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0%, 22%  { left: -60%; }
+  55%, 100% { left: 130%; }
+}
+
+.btn-icon {
+  position: relative;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+}
+.btn-label { position: relative; }
+
+/* Hover: subtle lift. */
+@media (hover: hover) {
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary:hover { box-shadow: 0 18px 38px -14px rgba(255, 255, 255, 0.45); }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+  }
+}
+
+.btn:active { transform: translateY(0) scale(0.99); filter: brightness(0.98); }
+
+/* Visible keyboard focus. */
+.btn:focus-visible {
+  outline: 2px solid #FFFFFF;
+  outline-offset: 3px;
+}
+
+/* ---- Footer --------------------------------------------------------------- */
+.footer {
+  position: relative;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+.footer p { margin: 0; }
+
+/* ---- Staggered entrance ---------------------------------------------------- */
+.logo, .eyebrow, .lede, .rule, .actions .btn, .footer {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.logo             { animation-delay: 0.05s; }
+.eyebrow          { animation-delay: 0.13s; }
+.lede             { animation-delay: 0.20s; }
+.rule             { animation-delay: 0.27s; }
+.actions .btn:nth-child(1) { animation-delay: 0.34s; }
+.actions .btn:nth-child(2) { animation-delay: 0.41s; }
+.actions .btn:nth-child(3) { animation-delay: 0.48s; }
+.actions .btn:nth-child(4) { animation-delay: 0.55s; }
+.footer           { animation-delay: 0.6s; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- Larger screens: a touch more air -------------------------------------- */
+@media (min-width: 768px) {
+  .card { max-width: 448px; }
+  .btn { min-height: 66px; font-size: 1.08rem; }
+}
+
+/* ---- Respect reduced-motion ----------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .logo, .eyebrow, .lede, .rule, .actions .btn, .footer { opacity: 1; transform: none; }
+  .btn:hover, .btn:active { transform: none; }
+}
