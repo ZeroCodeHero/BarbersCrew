@@ -47,7 +47,7 @@ body {
     max(18px, env(safe-area-inset-right))
     max(20px, env(safe-area-inset-bottom))
     max(18px, env(safe-area-inset-left));
-  overflow: hidden;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -303,6 +303,23 @@ body {
 @media (min-width: 768px) {
   .card { max-width: 448px; }
   .btn { min-height: 66px; font-size: 1.08rem; }
+}
+
+/* ---- Short viewports (small phones, or embedded in a small preview frame):
+   shrink everything so the whole card fits without scrolling. Height-based
+   (not width-based) because the failure mode is vertical space running out,
+   whether that's a short phone or a compact iframe preview. Buttons stay at
+   48px, the touch-target floor. ------------------------------------------- */
+@media (max-height: 700px) {
+  .card { padding: clamp(20px, 5vw, 32px) clamp(18px, 5vw, 28px); gap: clamp(16px, 4vw, 22px); }
+  .hero { gap: 10px; }
+  .logo { width: min(60%, 190px); }
+  .eyebrow { font-size: 0.6rem; padding: 5px 12px; }
+  .lede { font-size: 0.86rem; }
+  .actions { gap: 9px; }
+  .btn { min-height: 48px; padding: 11px 18px; font-size: 0.9rem; }
+  .btn-icon { width: 18px; height: 18px; }
+  .footer { font-size: 0.72rem; }
 }
 
 /* ---- Respect reduced-motion ----------------------------------------------- */
